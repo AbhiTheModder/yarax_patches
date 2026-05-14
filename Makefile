@@ -8,7 +8,7 @@ patch:
 	echo "✓ Patches applied"
 
 update-yarax:
-	git submodule update --init --remote yara-x
+	git submodule update --init yara-x
 	make patch
 
 build: patch
