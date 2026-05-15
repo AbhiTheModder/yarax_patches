@@ -1,4 +1,4 @@
-.PHONY: patch build update-yarax
+.PHONY: patch update-yarax
 
 patch:
 	cd yara-x && \
@@ -10,9 +10,3 @@ patch:
 update-yarax:
 	git submodule update --init yara-x
 	make patch
-
-build: patch
-	cargo build
-
-test: patch
-	cargo test
