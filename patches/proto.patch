@@ -1,8 +1,8 @@
 diff --git a/lib/src/modules/protos/dex.proto b/lib/src/modules/protos/dex.proto
-index 9738e60e..5d2ed5cc 100644
+index acb238c4..a85f5c29 100644
 --- a/lib/src/modules/protos/dex.proto
 +++ b/lib/src/modules/protos/dex.proto
-@@ -51,6 +51,19 @@ message DexHeader {
+@@ -50,6 +50,19 @@ message DexHeader {
      optional uint32 link_size = 8;
      // Offset pointing to the link section data.
      optional uint32 link_off = 9 [(yara.field_options).fmt = "x"];
@@ -22,13 +22,15 @@ index 9738e60e..5d2ed5cc 100644
      // Size in bytes of the main data section.
      optional uint32 data_size = 23;
      // File offset pointing to the main data block.
-@@ -98,7 +111,8 @@ message ClassItem {
+@@ -96,8 +109,10 @@ message ClassItem {
+     optional uint32 access_flags = 2 [(yara.field_options).fmt = "flags:AccessFlag"];
      // Superclass descriptor inherited by this object.
      optional string superclass = 3;
++    // File offset pointing to the interfaces list.
++    optional uint32 interfaces_off = 4 [(yara.field_options).fmt = "x"];
      // Source code file name metadata string.
 -    optional string source_file = 4;
-+    optional uint32 interfaces_off = 4;
 +    optional string source_file = 5;
  }
-
+ 
  message MapList {

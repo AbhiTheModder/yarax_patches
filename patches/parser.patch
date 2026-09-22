@@ -1,42 +1,25 @@
 diff --git a/lib/src/modules/dex/parser.rs b/lib/src/modules/dex/parser.rs
-index 0b1f3b05..4cc950e1 100644
+index 7a652038..7642c289 100644
 --- a/lib/src/modules/dex/parser.rs
 +++ b/lib/src/modules/dex/parser.rs
-@@ -436,7 +436,7 @@ impl Dex {
-             return Ok((remainder, Vec::new()));
-         }
- 
--        // (class_idx, access_flags, superclass_idx, _, source_file_idx)
-+        // (class_idx, access_flags, superclass_idx, interfaces_off, source_file_idx)
-         let mut it =
-             iterator(remainder, (le_u32, le_u32, le_u32, le_u32, le_u32));
- 
-@@ -448,7 +448,7 @@ impl Dex {
+@@ -440,7 +440,7 @@ impl Dex {
                      class_idx,
                      access_flags,
                      superclass_idx,
 -                    _,
 +                    interfaces_off,
                      source_file_idx,
-                 )| {
-                     let class = type_items.get(class_idx as usize)?.clone();
-@@ -467,6 +467,7 @@ impl Dex {
-                         class,
-                         access_flags,
-                         superclass,
-+                        interfaces_off,
-                         source_file,
-                     })
-                 },
-@@ -610,6 +611,7 @@ pub struct ClassItem {
-     class: Rc<String>,
-     access_flags: u32,
-     superclass: Option<Rc<String>>,
-+    interfaces_off: u32,
-     source_file: Option<Rc<String>>,
- }
- 
-@@ -674,6 +676,20 @@ impl From<DexHeader> for protos::dex::DexHeader {
+                     _,
+                     _,
+@@ -461,6 +461,7 @@ impl Dex {
+                     let mut item = protos::dex::ClassItem::new();
+                     item.class = Some(class);
+                     item.set_access_flags(access_flags);
++                    item.set_interfaces_off(interfaces_off);
+                     if let Some(superclass) = superclass {
+                         item.superclass = Some(superclass);
+                     }
+@@ -605,6 +606,21 @@ impl From<DexHeader> for protos::dex::DexHeader {
          result.set_endian_tag(header.endian_tag);
          result.set_link_size(header.link_size);
          result.set_link_off(header.link_off);
@@ -54,6 +37,7 @@ index 0b1f3b05..4cc950e1 100644
 +        result.set_class_defs_size(header.class_defs_size);
 +        result.set_class_defs_off(header.class_defs_off);
 +        result.set_data_size(header.data_size);
++        result.set_data_off(header.data_off);
          result.container_size = header.container_size;
          result.header_offset = header.header_offset;
          result
