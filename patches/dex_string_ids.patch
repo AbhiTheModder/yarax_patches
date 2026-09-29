@@ -1,0 +1,79 @@
+--- a/lib/src/modules/protos/dex.proto
++++ b/lib/src/modules/protos/dex.proto
+@@ -28,6 +28,9 @@
+     repeated ClassItem class_defs = 8;
+     // Mapping metadata table listing item offsets and sizes.
+     optional MapList map_list = 9;
++    // String identifier items with offsets into the string data section
++    // (restored for parity with yara-C, which exposes string_ids[i].offset).
++    repeated StringId string_ids = 10;
+ }
+ 
+ // See: https://source.android.com/docs/core/runtime/dex-format#header-item
+@@ -73,6 +76,11 @@
+     optional uint32 header_offset = 26 [(yara.field_options).fmt = "x"];
+ }
+ 
++message StringId {
++    // File offset pointing to the string data item.
++    optional uint32 offset = 1 [(yara.field_options).fmt = "x"];
++}
++
+ message ProtoItem {
+     // Short-form signature representing the return and argument types.
+     optional string shorty = 1;
+--- a/lib/src/modules/dex/parser.rs
++++ b/lib/src/modules/dex/parser.rs
+@@ -33,6 +33,9 @@
+         // Extract defined strings
+         let strings = Self::parse_strings(data, &header);
+ 
++        // Extract string identifier items (offsets into string data)
++        let string_ids = Self::parse_string_ids(data, &header);
++
+         // Extract defined types
+         let types = Self::parse_types(data, &header, &strings);
+ 
+@@ -58,6 +61,7 @@
+ 
+         dex.header = MessageField::some(header.into());
+         dex.strings = strings;
++        dex.string_ids = string_ids;
+         dex.types = types;
+         dex.protos = protos;
+         dex.fields = fields;
+@@ -190,6 +194,34 @@
+             .collect()
+     }
+ 
++    /// Collects string identifier items (offsets into the string data
++    /// section) from the string_ids_off table.
++    ///
++    /// See: https://source.android.com/docs/core/runtime/dex-format#string-id-item
++    fn parse_string_ids(
++        data: &[u8],
++        header: &DexHeader,
++    ) -> Vec<protos::dex::StringId> {
++        if header.string_ids_off == 0 {
++            return Vec::new();
++        }
++
++        let table_slice = match data.get(header.string_ids_off as usize..) {
++            Some(slice) => slice,
++            None => return Vec::new(),
++        };
++
++        iterator(table_slice, le_u32::<&[u8], Error>)
++            .take(Self::MAX_STRINGS)
++            .take(header.string_ids_size as usize)
++            .map(|offset| {
++                let mut item = protos::dex::StringId::new();
++                item.set_offset(offset);
++                item
++            })
++            .collect()
++    }
++
+     /// Parses string by index in the string_ids_off table
+     ///
+     /// idx - is an index in the string_ids_off table
