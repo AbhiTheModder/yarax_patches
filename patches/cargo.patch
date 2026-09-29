@@ -1,0 +1,13 @@
+diff --git a/py/Cargo.toml b/py/Cargo.toml
+index 2a505f4a..c10100ce 100644
+--- a/py/Cargo.toml
++++ b/py/Cargo.toml
+@@ -65,7 +65,7 @@ serde_json = { workspace = true }
+ strum = { workspace = true }
+ strum_macros = { workspace = true }
+ 
+-yara-x = { workspace = true }
++yara-x = { path = "../lib", version = "1.20.0", default-features = false, features = ["dex-module", "hash-module", "crypto", "pe-module", "elf-module", "generate-proto-code"] }
+ yara-x-proto = { workspace = true }
+ yara-x-fmt = { workspace = true }
+ yara-x-parser = { workspace = true }
