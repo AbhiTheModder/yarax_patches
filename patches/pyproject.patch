@@ -1,0 +1,14 @@
+diff --git a/py/pyproject.toml b/py/pyproject.toml
+--- a/py/pyproject.toml
++++ b/py/pyproject.toml
+@@ -3,8 +3,8 @@
+ build-backend = "maturin"
+ 
+ [project]
+-name = "yara-x"
+-description = "Python bindings for YARA-X"
++name = "yarax-python-dex"
++description = "Patched YARA-X Python bindings for APKiD (restored DEX fields)"
+ dynamic = ["version"]
+ requires-python = ">=3.9"
+ readme = "README.md"
