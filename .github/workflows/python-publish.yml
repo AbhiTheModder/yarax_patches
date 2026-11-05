@@ -71,6 +71,11 @@ jobs:
           git reset --hard HEAD
           git apply --whitespace=nowarn ../patches/*.patch
 
+      - name: Drop upstream musl config
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        shell: bash
+        run: rm -f yara-x/.cargo/config.toml
+
       - name: Set version from release tag
         shell: bash
         run: |
